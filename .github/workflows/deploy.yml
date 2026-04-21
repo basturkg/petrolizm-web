@@ -1,0 +1,22 @@
+name: Petrolizm Auto Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Kodu GitHub'dan çek
+        uses: actions/checkout@v4
+
+      - name: Eski konteyneri temizle
+        run: |
+          sudo docker stop petrolizm-web-container || true
+          sudo docker rm petrolizm-web-container || true
+
+      - name: Yeni imajı oluştur ve yayına al
+        run: |
+          sudo docker build --no-cache -t petrolizm-app .
+          sudo docker run -d -p 80:80 --name petrolizm-web-container petrolizm-app
